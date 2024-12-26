@@ -137,4 +137,5 @@ func (repo *merchantService) GetProductService(userIdCtx uuid.UUID, id string) (
 	}
 
 	return repo.GetProductsRepository(UserId, productId)
+
 }
