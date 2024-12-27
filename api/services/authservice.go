@@ -10,16 +10,16 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type AuthService interface {
+type IAuthService interface {
 	SignUpService(models.Users) *dto.ErrorResponse
 	LoginService(dto.LoginRequest) (*models.Users, *dto.ErrorResponse)
 }
 
 type authService struct {
-	repositories.AuthRepository
+	repositories.IAuthRepository
 }
 
-func CommenceAuthService(auth repositories.AuthRepository) AuthService {
+func CommenceAuthService(auth repositories.IAuthRepository) IAuthService {
 	return &authService{auth}
 }
 
@@ -31,7 +31,7 @@ func (authRepo *authService) SignUpService(user models.Users) *dto.ErrorResponse
 	}
 
 	user.Password = string(hashedPin)
-	if err := authRepo.AuthRepository.SignUpUser(user); err != nil {
+	if err := authRepo.IAuthRepository.SignUpUser(user); err != nil {
 		return err
 	}
 
@@ -39,7 +39,7 @@ func (authRepo *authService) SignUpService(user models.Users) *dto.ErrorResponse
 }
 
 func (authRepo *authService) LoginService(loginRequest dto.LoginRequest) (*models.Users, *dto.ErrorResponse) {
-	user, err := authRepo.AuthRepository.LoginUser(loginRequest)
+	user, err := authRepo.IAuthRepository.LoginUser(loginRequest)
 	if err != nil {
 		return nil, err
 	}

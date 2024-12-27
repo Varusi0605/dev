@@ -36,6 +36,7 @@ type Addresses struct {
 	State     string    `json:"state,omitempty" gorm:"not null"`
 	ZipCode   uint      `json:"zip_code,omitempty" gorm:"not null"`
 	UserId    uuid.UUID `json:"user_id,omitempty"`
+	Order     Orders    `json:"-" gorm:"foreignKey:AddressId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 }
 
 type Categories struct {
@@ -63,18 +64,20 @@ type Products struct {
 
 type Orders struct {
 	OrderId     uuid.UUID      `json:"ordered_id,omitempty" gorm:"type:uuid;primaryKey"`
-	UserId      uint           `json:"user_id,omitempty" gorm:"not null"`
+	UserId      uuid.UUID      `json:"user_id,omitempty" gorm:"not null"`
+	AddressId   uuid.UUID      `json:"address_id,omitempty" gorm:"not null"`
 	Name        string         `json:"name,omitempty" gorm:"not null"`
 	Email       string         `json:"first_name,omitempty" gorm:"not null"`
-	Products    []OrderedItems `json:"product,omitempty" gorm:"foreignKey:OrderId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
-	TotalAmount float64        `json:"total_amount,omitempty" gorm:"not null"`
-	Status      string         `json:"status,omitempty" gorm:"not null"`
+	Phone       string         `json:"phone,omitempty" gorm:"not null"`
+	Products    []OrderedItems `json:"products,omitempty" gorm:"foreignKey:OrderId;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	TotalAmount float64        `json:"total_amount,omitempty" gorm:"null"`
+	Status      string         `json:"status,omitempty"`
 	CreatedAt   time.Time      `json:"created_at,omitempty" gorm:"autoCreateTime"`
 }
 
 type OrderedItems struct {
 	OrderedItemsId uuid.UUID `json:"ordered_items_id,omitempty" gorm:"type:uuid;primaryKey"`
-	ProductId      uint      `json:"product_id,omitempty" gorm:"not null"`
+	ProductId      uuid.UUID `json:"product_id,omitempty" gorm:"not null"`
 	ProductName    string    `json:"product_name,omitempty" gorm:"not null" `
 	Quantity       uint      `json:"quantity,omitempty" gorm:"not null"`
 	Price          float64   `json:"price,omitempty" gorm:"not null"`

@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type AuthRepository interface {
+type IAuthRepository interface {
 	LoginUser(dto.LoginRequest) (*models.Users, *dto.ErrorResponse)
 	SignUpUser(models.Users) *dto.ErrorResponse
 }
@@ -18,7 +18,7 @@ type authRepository struct {
 	*gorm.DB
 }
 
-func CommenceAuthRepository(db *gorm.DB) AuthRepository {
+func CommenceAuthRepository(db *gorm.DB) IAuthRepository {
 	return &authRepository{db}
 }
 

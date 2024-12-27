@@ -9,10 +9,8 @@ import (
 	"gorm.io/gorm"
 )
 
-var Pg *gorm.DB
-
 func InitiatePgConnection() *gorm.DB {
-	dsn := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable", os.Getenv("USER"), os.Getenv("PASSWORD"), os.Getenv("HOST"), os.Getenv("PORT"), os.Getenv("DBNAME"))
+	dsn := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
 
 	client, err := gorm.Open(postgres.Open(dsn), &gorm.Config{TranslateError: true})
 	if err != nil {
@@ -21,8 +19,6 @@ func InitiatePgConnection() *gorm.DB {
 
 	loggers.InfoLog.Print("Connected to postgress client")
 	fmt.Println("Connected to postgress client")
-
-	Pg = client
 
 	return client
 }

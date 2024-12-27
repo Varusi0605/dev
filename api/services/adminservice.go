@@ -6,16 +6,16 @@ import (
 	"shopping-site/utils/dto"
 )
 
-type AdminService interface {
+type IAdminService interface {
 	AddCategoreyService(*models.Categories) *dto.ErrorResponse
 	AddBrandService(*models.Brands) *dto.ErrorResponse
 }
 
 type adminService struct {
-	repositories.AdminRepository
+	repositories.IAdminRepository
 }
 
-func CommenceAdminService(admin repositories.AdminRepository) AdminService {
+func CommenceAdminService(admin repositories.IAdminRepository) IAdminService {
 	return &adminService{admin}
 }
 

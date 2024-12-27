@@ -1,8 +1,10 @@
 package loggers
 
 import (
+	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 var (
@@ -12,10 +14,23 @@ var (
 	WarnLog  *log.Logger
 )
 
+func recoverLoadEnv() {
+	if res := recover(); res != nil {
+		fmt.Println("recovered from ", res)
+	}
+}
+
 func ForLogs() {
-	file, err := os.OpenFile("log.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0664)
+	defer recoverLoadEnv()
+
+	workingDir, err := os.Getwd()
 	if err != nil {
-		log.Panic("Error while opeaning file")
+		panic(err)
+	}
+
+	file, err := os.OpenFile(filepath.Join(filepath.Dir(workingDir), os.Getenv("LOGGERS_PATH")), os.O_APPEND|os.O_CREATE|os.O_RDWR, 0664)
+	if err != nil {
+		panic(err)
 	}
 
 	InfoLog = log.New(file, "INFO:", log.LstdFlags|log.Llongfile)

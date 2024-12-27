@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type AdminRepository interface {
+type IAdminRepository interface {
 	AddCategoreyRepository(*models.Categories) *dto.ErrorResponse
 	AddBrandRepository(*models.Brands) *dto.ErrorResponse
 }
@@ -17,7 +17,7 @@ type adminRepository struct {
 	*gorm.DB
 }
 
-func CommenceAdminRepository(db *gorm.DB) AdminRepository {
+func CommenceAdminRepository(db *gorm.DB) IAdminRepository {
 	return &adminRepository{db}
 }
 

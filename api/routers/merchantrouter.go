@@ -15,17 +15,17 @@ func MerchantRoute(app *fiber.App, db *gorm.DB) {
 
 	merchantService := services.CommenceMerchantService(merchantRepository)
 
-	handler := handlers.MerchantHandler{MerchantService: merchantService}
+	handler := handlers.MerchantHandler{IMerchantService: merchantService}
 
-	user := app.Group("/v1/role/merchant")
-	user.Use(middleware.ValidateJwt, middleware.MerchantRoleAuthentication)
+	merchant := app.Group("/v1/role/merchant")
+	merchant.Use(middleware.ValidateJwt, middleware.MerchantRoleAuthentication)
 
-	user.Post("/product", handler.AddProductHandler)
-	user.Delete("/product/:id", handler.RemoveProductHandler)
-	user.Patch("/product", handler.UpdateProductHandler)
-	user.Patch("", handler.UpdateMerchantHandler)
-	user.Patch("order:id", handler.UpdateOrderStatusHandler)
-	// user.Get("order", handler.GetOrderHandler)
-	user.Get("product", handler.GetProductsHandler)
-	user.Get("product:id", handler.GetProductHandler)
+	merchant.Post("/product", handler.AddProductHandler)
+	merchant.Get("product", handler.GetProductsHandler)
+	merchant.Get("/order", handler.GetOrdersHandler)
+	merchant.Get("/product/:id", handler.GetProductHandler)
+	merchant.Patch("/product", handler.UpdateProductHandler)
+	merchant.Patch("", handler.UpdateMerchantHandler)
+	merchant.Patch("/order:id", handler.UpdateOrderStatusHandler)
+	merchant.Delete("/product/:id", handler.RemoveProductHandler)
 }

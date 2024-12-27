@@ -10,7 +10,7 @@ import (
 )
 
 type AdminHandler struct {
-	services.AdminService
+	services.IAdminService
 }
 
 func (service *AdminHandler) AddCategoreyHandler(ctx *fiber.Ctx) error {
@@ -23,7 +23,7 @@ func (service *AdminHandler) AddCategoreyHandler(ctx *fiber.Ctx) error {
 		})
 	}
 
-	errResponse := service.AdminService.AddCategoreyService(&category)
+	errResponse := service.IAdminService.AddCategoreyService(&category)
 	if errResponse != nil {
 		return ctx.Status(errResponse.Status).JSON(dto.ResponseJson{
 			Error: errResponse.Error,
@@ -46,7 +46,7 @@ func (service *AdminHandler) AddBrandHandler(ctx *fiber.Ctx) error {
 		})
 	}
 
-	errResponse := service.AdminService.AddBrandService(&brand)
+	errResponse := service.IAdminService.AddBrandService(&brand)
 	if errResponse != nil {
 		return ctx.Status(errResponse.Status).JSON(dto.ResponseJson{
 			Error: errResponse.Error,

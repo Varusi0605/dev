@@ -14,7 +14,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type MerchantService interface {
+type IMerchantService interface {
 	AddProductService(uuid.UUID, *models.Products) *dto.ErrorResponse
 	RemoveProductService(string) *dto.ErrorResponse
 	UpdateProductService(uuid.UUID, *models.Products) *dto.ErrorResponse
@@ -22,13 +22,14 @@ type MerchantService interface {
 	GetProductsService(map[string]string, uuid.UUID) (*[]models.Products, *dto.ErrorResponse)
 	UpdateOrderStatusService(uuid.UUID, string, string) *dto.ErrorResponse
 	GetProductService(uuid.UUID, string) (*models.Products, *dto.ErrorResponse)
+	GetOrdersService(uuid.UUID) (*models.Orders, *dto.ErrorResponse)
 }
 
 type merchantService struct {
-	repositories.MerchantRepository
+	repositories.IMerchantRepository
 }
 
-func CommenceMerchantService(merchant repositories.MerchantRepository) MerchantService {
+func CommenceMerchantService(merchant repositories.IMerchantRepository) IMerchantService {
 	return &merchantService{merchant}
 }
 
@@ -136,6 +137,11 @@ func (repo *merchantService) GetProductService(userIdCtx uuid.UUID, id string) (
 			Error: err.Error()}
 	}
 
-	return repo.GetProductsRepository(UserId, productId)
+	return repo.GetProductRepository(UserId, productId)
+}
 
+func (repo *merchantService) GetOrdersService(userIdCtx uuid.UUID) (*models.Orders, *dto.ErrorResponse) {
+	UserId := userIdCtx
+
+	return repo.GetOrdersRepository(UserId)
 }

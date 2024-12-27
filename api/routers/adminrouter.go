@@ -15,7 +15,7 @@ func AdminRoute(app *fiber.App, db *gorm.DB) {
 
 	adminService := services.CommenceAdminService(adminRepository)
 
-	handler := handlers.AdminHandler{AdminService: adminService}
+	handler := handlers.AdminHandler{IAdminService: adminService}
 
 	user := app.Group("/v1/role/admin")
 	user.Use(middleware.ValidateJwt, middleware.AdminRoleAuthentication)

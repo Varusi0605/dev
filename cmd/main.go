@@ -10,15 +10,15 @@ import (
 )
 
 func init() {
-	loggers.ForLogs()
 	internals.LoadEnvFile()
+	loggers.ForLogs()
 }
+
 func main() {
 	db := internals.InitiatePgConnection()
 	internals.SchemaMigration(db)
 
 	app := fiber.New()
-
 	routers.RequiredRoute(app, db)
 
 	err := app.Listen(os.Getenv("CLIENTPORT"))

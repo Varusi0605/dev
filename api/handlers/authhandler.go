@@ -14,7 +14,7 @@ import (
 )
 
 type AuthHandler struct {
-	services.AuthService
+	services.IAuthService
 }
 
 func (handler *AuthHandler) SignupHandler(ctx *fiber.Ctx) error {
@@ -22,22 +22,22 @@ func (handler *AuthHandler) SignupHandler(ctx *fiber.Ctx) error {
 
 	if err := ctx.BodyParser(&user); err != nil {
 		loggers.WarnLog.Println(err)
-		return ctx.Status(400).JSON(dto.ResponseJson{Error: err.Error()})
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.ResponseJson{Error: err.Error()})
 	}
 
 	if err := validation.ValidateUser(user); err != nil {
 		loggers.WarnLog.Println(err)
-		return ctx.Status(400).JSON(dto.ResponseJson{
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
-	if err := handler.AuthService.SignUpService(user); err != nil {
+	if err := handler.IAuthService.SignUpService(user); err != nil {
 		loggers.ErrorLog.Println(err.Error)
 		return ctx.Status(err.Status).JSON(dto.ResponseJson{Error: err.Error})
 	}
 
-	return ctx.Status(201).JSON(dto.ResponseJson{Message: "User Created"})
+	return ctx.Status(fiber.StatusCreated).JSON(dto.ResponseJson{Message: "User Created"})
 }
 
 func (handler *AuthHandler) LoginHandler(ctx *fiber.Ctx) error {
@@ -45,17 +45,17 @@ func (handler *AuthHandler) LoginHandler(ctx *fiber.Ctx) error {
 
 	if err := ctx.BodyParser(&loginRequest); err != nil {
 		loggers.WarnLog.Println(err)
-		return ctx.Status(400).JSON(dto.ResponseJson{Error: err.Error()})
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.ResponseJson{Error: err.Error()})
 	}
 
 	if err := validation.ValidateLogin(loginRequest); err != nil {
 		loggers.WarnLog.Println(err)
-		return ctx.Status(400).JSON(dto.ResponseJson{
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.ResponseJson{
 			Error: err.Error(),
 		})
 	}
 
-	user, errResponse := handler.AuthService.LoginService(loginRequest)
+	user, errResponse := handler.IAuthService.LoginService(loginRequest)
 	if errResponse != nil {
 		loggers.ErrorLog.Println(errResponse.Error)
 		return ctx.Status(errResponse.Status).JSON(dto.ResponseJson{Error: errResponse.Error})
@@ -75,7 +75,7 @@ func (handler *AuthHandler) LoginHandler(ctx *fiber.Ctx) error {
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 	if err != nil {
 		loggers.WarnLog.Println(err)
-		return ctx.Status(400).JSON(dto.ResponseJson{Error: err.Error()})
+		return ctx.Status(fiber.StatusBadRequest).JSON(dto.ResponseJson{Error: err.Error()})
 	}
 
 	cookie := fiber.Cookie{
@@ -86,6 +86,6 @@ func (handler *AuthHandler) LoginHandler(ctx *fiber.Ctx) error {
 	}
 
 	ctx.Cookie(&cookie)
-	return ctx.Status(201).JSON(dto.ResponseJson{Message: "Logged in successfully"})
+	return ctx.Status(fiber.StatusCreated).JSON(dto.ResponseJson{Message: "Logged in successfully"})
 
 }

@@ -12,12 +12,13 @@ import (
 )
 
 type MerchantHandler struct {
-	services.MerchantService
+	services.IMerchantService
 }
 
 func (service *MerchantHandler) AddProductHandler(ctx *fiber.Ctx) error {
 	var product models.Products
 	userIdCtx := ctx.Locals("user_id").(uuid.UUID)
+
 	if err := ctx.BodyParser(&product); err != nil {
 		loggers.WarnLog.Println(err)
 		return ctx.Status(fiber.StatusBadRequest).JSON(dto.ResponseJson{
@@ -25,7 +26,7 @@ func (service *MerchantHandler) AddProductHandler(ctx *fiber.Ctx) error {
 		})
 	}
 
-	errResponse := service.MerchantService.AddProductService(userIdCtx, &product)
+	errResponse := service.IMerchantService.AddProductService(userIdCtx, &product)
 	if errResponse != nil {
 		return ctx.Status(errResponse.Status).JSON(dto.ResponseJson{
 			Error: errResponse.Error,
@@ -41,7 +42,7 @@ func (service *MerchantHandler) AddProductHandler(ctx *fiber.Ctx) error {
 func (service *MerchantHandler) RemoveProductHandler(ctx *fiber.Ctx) error {
 	id := ctx.Params("id")
 
-	errResponse := service.MerchantService.RemoveProductService(id)
+	errResponse := service.IMerchantService.RemoveProductService(id)
 	if errResponse != nil {
 		return ctx.Status(errResponse.Status).JSON(dto.ResponseJson{
 			Error: errResponse.Error,
@@ -64,7 +65,7 @@ func (service *MerchantHandler) UpdateProductHandler(ctx *fiber.Ctx) error {
 		})
 	}
 
-	errResponse := service.MerchantService.UpdateProductService(userIdCtx, &product)
+	errResponse := service.IMerchantService.UpdateProductService(userIdCtx, &product)
 	if errResponse != nil {
 		return ctx.Status(errResponse.Status).JSON(dto.ResponseJson{
 			Error: errResponse.Error,
@@ -88,7 +89,7 @@ func (service *MerchantHandler) UpdateMerchantHandler(ctx *fiber.Ctx) error {
 		})
 	}
 
-	errResponse := service.MerchantService.UpdateMerchantService(userIdCtx, &user)
+	errResponse := service.IMerchantService.UpdateMerchantService(userIdCtx, &user)
 	if errResponse != nil {
 		return ctx.Status(errResponse.Status).JSON(dto.ResponseJson{
 			Error: errResponse.Error,
@@ -97,7 +98,7 @@ func (service *MerchantHandler) UpdateMerchantHandler(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusCreated).JSON(dto.ResponseJson{
 		Message: "user details updated successfully",
-		Data:    map[string]interface{}{"product_id": user.UserId},
+		Data:    map[string]interface{}{"user_id": user.UserId},
 	})
 }
 
@@ -107,7 +108,7 @@ func (service *MerchantHandler) UpdateOrderStatusHandler(ctx *fiber.Ctx) error {
 	fmt.Println("**", orderStatus)
 	userIdCtx := ctx.Locals("user_id").(uuid.UUID)
 
-	errResponse := service.MerchantService.UpdateOrderStatusService(userIdCtx, id, orderStatus)
+	errResponse := service.IMerchantService.UpdateOrderStatusService(userIdCtx, id, orderStatus)
 	if errResponse != nil {
 		return ctx.Status(errResponse.Status).JSON(dto.ResponseJson{
 			Error: errResponse.Error,
@@ -125,7 +126,7 @@ func (service *MerchantHandler) GetProductsHandler(ctx *fiber.Ctx) error {
 
 	filters := ctx.Queries()
 
-	products, errResponse := service.MerchantService.GetProductsService(filters, userIdCtx)
+	products, errResponse := service.IMerchantService.GetProductsService(filters, userIdCtx)
 	if errResponse != nil {
 		return ctx.Status(errResponse.Status).JSON(dto.ResponseJson{
 			Error: errResponse.Error,
@@ -141,7 +142,7 @@ func (service *MerchantHandler) GetProductHandler(ctx *fiber.Ctx) error {
 	userIdCtx := ctx.Locals("user_id").(uuid.UUID)
 	id := ctx.Params("id")
 
-	product, errResponse := service.MerchantService.GetProductService(userIdCtx, id)
+	product, errResponse := service.IMerchantService.GetProductService(userIdCtx, id)
 	if errResponse != nil {
 		return ctx.Status(errResponse.Status).JSON(dto.ResponseJson{
 			Error: errResponse.Error,
@@ -150,5 +151,20 @@ func (service *MerchantHandler) GetProductHandler(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusCreated).JSON(dto.ResponseJson{
 		Data: product,
+	})
+}
+
+func (service *MerchantHandler) GetOrdersHandler(ctx *fiber.Ctx) error {
+	userIdCtx := ctx.Locals("user_id").(uuid.UUID)
+
+	orders, errResponse := service.IMerchantService.GetOrdersService(userIdCtx)
+	if errResponse != nil {
+		return ctx.Status(errResponse.Status).JSON(dto.ResponseJson{
+			Error: errResponse.Error,
+		})
+	}
+
+	return ctx.Status(fiber.StatusCreated).JSON(dto.ResponseJson{
+		Data: orders,
 	})
 }

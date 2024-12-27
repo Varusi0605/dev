@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type MerchantRepository interface {
+type IMerchantRepository interface {
 	AddProductRepository(*models.Products) *dto.ErrorResponse
 	RemoveProductRepository(uuid.UUID) *dto.ErrorResponse
 	UpdateProductRepository(*models.Products) *dto.ErrorResponse
@@ -17,13 +17,14 @@ type MerchantRepository interface {
 	UpdateOrderStatusRepository(uuid.UUID, uuid.UUID, string) *dto.ErrorResponse
 	GetProductsRepository(map[string]string, uuid.UUID) (*[]models.Products, *dto.ErrorResponse)
 	GetProductRepository(uuid.UUID, uuid.UUID) (*models.Products, *dto.ErrorResponse)
+	GetOrdersRepository(uuid.UUID) (*models.Orders, *dto.ErrorResponse)
 }
 
 type merchantRepository struct {
 	*gorm.DB
 }
 
-func CommenceMerchantRepository(db *gorm.DB) MerchantRepository {
+func CommenceMerchantRepository(db *gorm.DB) IMerchantRepository {
 	return &merchantRepository{db}
 }
 
@@ -166,11 +167,23 @@ func (db *merchantRepository) GetProductsRepository(filter map[string]string, us
 func (db *merchantRepository) GetProductRepository(userId uuid.UUID, productId uuid.UUID) (*models.Products, *dto.ErrorResponse) {
 	var product models.Products
 
-	record := db.Where("product_id= ? AND user_id", productId, userId).First(&product)
+	record := db.Where("product_id= ? AND user_id= ?", productId, userId).First(&product)
 	if record.RowsAffected == 0 {
 		return nil, &dto.ErrorResponse{Status: fiber.StatusNotFound,
 			Error: "product not found on your listing"}
 	}
 
 	return &product, nil
+}
+
+func (db *merchantRepository) GetOrdersRepository(userId uuid.UUID) (*models.Orders, *dto.ErrorResponse) {
+	var orders models.Orders
+
+	record := db.Where("user_id= ?", userId).First(&orders)
+	if record.RowsAffected == 0 {
+		return nil, &dto.ErrorResponse{Status: fiber.StatusNotFound,
+			Error: "no orders avilable"}
+	}
+
+	return &orders, nil
 }
